@@ -60,7 +60,7 @@ main {
     border: none;
 }
 
-.task .buttonDelete {
+.task .buttonRemove {
     min-height: 50%;
     width: 20%;
     border-radius: 30px;

@@ -26,19 +26,43 @@ buttonAdd.addEventListener("click", () => {
 })
 
 const updateTasks = () => {
-    todoTasks.innerHTML = "";
+    let toRemove = todoTasks.querySelectorAll(".task");
+    toRemove.forEach(element => {
+        todoTasks.removeChild(element);
+    });
     for (let i = 0; i < tasks.length; i ++) {
-        let element = tasks[i];
-        todoTasks.innerHTML += "<div class='task'>" +
-                    "<button class='buttonDone'>k</button>" +
-                    "<textarea class='name'>" + element.name + "</textarea>" +
-                    "<button class='buttonDelete'>x</button>" +
-                    "</div>";
-        let buttonDelete = todoTasks.querySelector(".buttonDelete");
-        buttonDelete.addEventListener("click", () => {
+        let task = document.createElement("div");
+        task.classList.add("task");
+
+        let buttonDone = document.createElement("button");
+        buttonDone.textContent = "k";
+        buttonDone.classList.add("buttonDone");
+        buttonDone.addEventListener("click", () => {
+            tasks[i].isDone = !tasks[i].isDone;
+        });
+
+        let textArea = document.createElement("textarea");
+        textArea.textContent = tasks[i].name;
+        textArea.classList.add("name");
+        textArea.addEventListener("input", () => {
+            tasks[i].name = textArea.value;
+            console.log(textArea.value);
+        });
+
+        let buttonRemove = document.createElement("button");
+        buttonRemove.textContent = "x";
+        buttonRemove.classList.add("buttonRemove");
+        buttonRemove.addEventListener("click", () => {
             tasks.splice(i, 1);
             updateTasks();
         });
+
+        task.append(buttonDone);
+        task.append(textArea);
+        task.append(buttonRemove);
+
+
+        todoTasks.insertBefore(task, buttonAdd);
     }
 }
 
