@@ -1,0 +1,81 @@
+html {
+    margin: 0;
+    height: 99%;
+    font-family: sans-serif;
+}
+
+body {
+    background-color: #272727;
+    height: 100%;
+}
+
+header {
+    height: 15%;
+}
+
+main {
+    display: flex;
+    padding-left: 10%;
+    padding-right: 10%;
+    justify-content: space-between;
+    min-height: 70%;
+}
+
+.table {
+    width: 30%;
+    background-color: #8C8A93;
+    border-radius: 30px;
+    text-align: center;
+}
+
+.table h1 {
+    text-align: center;
+    color: white;
+}
+
+.task {
+    margin: 5%;
+    display: flex;
+    background-color: #DCFFFD;
+    border-radius: 30px;
+    padding-left: 2%;
+    padding-right: 2%;
+}
+
+.task .name {
+    height: 70%;
+    width: 80%;
+    background-color: white;
+    border-radius: 30px;
+    padding: 5%;
+    text-align: left;
+    resize: none;
+}
+
+.task .buttonDone {
+    min-height: 50%;
+    width: 20%;
+    border-radius: 30px;
+    background-color: #DCFFFD;
+    border: none;
+}
+
+.task .buttonDelete {
+    min-height: 50%;
+    width: 20%;
+    border-radius: 30px;
+    background-color: #DCFFFD;
+    border: none;
+}
+
+.table .buttonAdd {
+    margin-top: 5%;
+    width: 80%;
+    height: 30px;
+    align-self: center;
+}
+
+footer {
+    height: 15%;
+}
+
