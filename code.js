@@ -3,9 +3,9 @@ const buttonAddToDo = document.querySelector("#todo .buttonAdd");
 const buttonAddInProgress = document.querySelector("#inprogress .buttonAdd");
 const buttonAddDone = document.querySelector("#done .buttonAdd");
 
-const tasksToDoObject = document.querySelector("#todo .tasks");
-const tasksInProgressObject = document.querySelector("#inprogress .tasks");
-const tasksDoneObject = document.querySelector("#done .tasks");
+const tasksToDoObject = document.querySelector("#todo-tasks");
+const tasksInProgressObject = document.querySelector("#inprogress-tasks");
+const tasksDoneObject = document.querySelector("#done-tasks");
 
 
 
@@ -19,16 +19,6 @@ var tasksToDo = [
 var tasksInProgress = []
 var tasksDone = []
 
-if (localStorage.getItem("tasksToDo") != null) {
-    tasksToDo = localStorage.getItem("tasksToDo");
-}
-if (localStorage.getItem("tasksInProgress") != null) {
-    tasksInProgress = localStorage.getItem("tasksInProgress");
-}
-if (localStorage.getItem("tasksDone") != null) {
-    tasksDone = localStorage.getItem("tasksDone");
-}
-
 buttonAddToDo.addEventListener("click", () => {
     tasksToDo.push(
         {
@@ -36,7 +26,7 @@ buttonAddToDo.addEventListener("click", () => {
             "isDone": false
         }
     );
-updateTasksAll();
+    updateTasksAll();
 })
 buttonAddInProgress.addEventListener("click", () => {
     tasksInProgress.push(
@@ -45,7 +35,7 @@ buttonAddInProgress.addEventListener("click", () => {
             "isDone": false
         }
     );
-updateTasksAll();
+    updateTasksAll();
 })
 buttonAddDone.addEventListener("click", () => {
     tasksDone.push(
@@ -54,7 +44,7 @@ buttonAddDone.addEventListener("click", () => {
             "isDone": false
         }
     );
-updateTasksAll();
+    updateTasksAll();
 })
 
 
@@ -102,7 +92,7 @@ const updateTasks = (tasks, tasksObject, buttonAdd) => {
         buttonRemove.classList.add("buttonRemove");
         buttonRemove.addEventListener("click", () => {
             tasks.splice(i, 1);
-            updateTasks();
+            updateTasksAll();
             saveAll();
         });
 

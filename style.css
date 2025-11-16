@@ -22,8 +22,7 @@ body {
     margin: 0;
     height: 100%;
     background: var(--bg-color);
-    background-attachment: fi;
-    
+    background-attachment: fixed;
 }
 
 header {
@@ -50,6 +49,7 @@ main {
 
 .table:hover {
     margin-top: -10px;
+    margin-bottom: 10px;
     background-color: #171717;
 }
 
@@ -108,6 +108,7 @@ main {
 
 .buttonAdd {
     margin-top: 5%;
+    margin-bottom: 5%;
     width: 80%;
     height: 50px;
     align-self: center;
