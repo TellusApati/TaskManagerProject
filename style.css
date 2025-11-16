@@ -14,14 +14,16 @@
 }
 
 html {
-    margin: 0;
     height: 99%;
     font-family: sans-serif;
 }
 
 body {
-    background: var(--bg-color);
+    margin: 0;
     height: 100%;
+    background: var(--bg-color);
+    background-attachment: fi;
+    
 }
 
 header {
@@ -68,7 +70,7 @@ main {
 }
 
 .task.done {
-    filter: brightness(50%);
+    filter: brightness(50%) grayscale(100%);
 }
 
 .name {
