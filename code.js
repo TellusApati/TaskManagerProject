@@ -7,17 +7,33 @@ const tasksToDoObject = document.querySelector("#todo-tasks");
 const tasksInProgressObject = document.querySelector("#inprogress-tasks");
 const tasksDoneObject = document.querySelector("#done-tasks");
 
+const tableToDo = document.querySelector("#todo");
+const tableInProgress = document.querySelector("#inprogress");
+const tableDone = document.querySelector("#done");
 
+var draggingIndex = null;
+var draggingList = null;
 
 var tasksToDo = [
     {
-        "name": "Testing task",
+        "name": "Example task",
         "isDone": false
     }
 ]
 
 var tasksInProgress = []
 var tasksDone = []
+
+
+if (localStorage.getItem("tasksToDo") != null) {
+    tasksToDo = JSON.parse(localStorage.getItem("tasksToDo"));
+}
+if (localStorage.getItem("tasksInProgress") != null) {
+    tasksInProgress = JSON.parse(localStorage.getItem("tasksInProgress"));
+}
+if (localStorage.getItem("tasksDone") != null) {
+    tasksDone = JSON.parse(localStorage.getItem("tasksDone"));
+}
 
 buttonAddToDo.addEventListener("click", () => {
     tasksToDo.push(
@@ -27,6 +43,7 @@ buttonAddToDo.addEventListener("click", () => {
         }
     );
     updateTasksAll();
+    saveAll();
 })
 buttonAddInProgress.addEventListener("click", () => {
     tasksInProgress.push(
@@ -36,6 +53,7 @@ buttonAddInProgress.addEventListener("click", () => {
         }
     );
     updateTasksAll();
+    saveAll();
 })
 buttonAddDone.addEventListener("click", () => {
     tasksDone.push(
@@ -45,8 +63,40 @@ buttonAddDone.addEventListener("click", () => {
         }
     );
     updateTasksAll();
+    saveAll();
 })
 
+tableToDo.addEventListener("dragover", (event) => {event.preventDefault();});
+tableToDo.addEventListener("drop", (event) => {
+    event.preventDefault();
+    if (!event.target.closest(".task")) {
+        tasksToDo.push(draggingList[draggingIndex]);
+        draggingList.pop(draggingIndex);
+        updateTasksAll();
+        saveAll();
+    }
+});
+tableInProgress.addEventListener("dragover", (event) => {event.preventDefault();});
+tableInProgress.addEventListener("drop", (event) => {
+    event.preventDefault();
+    if (!event.target.closest(".task")) {
+        tasksInProgress.push(draggingList[draggingIndex]);
+        draggingList.pop(draggingIndex);
+        updateTasksAll();
+        saveAll();
+    }
+});
+tableDone.addEventListener("dragover", (event) => {event.preventDefault();});
+tableDone.addEventListener("drop", (event) => {
+    event.preventDefault();
+    if (!event.target.closest(".task")) {
+        tasksDone.push(draggingList[draggingIndex]);
+        draggingList.pop(draggingIndex);
+        updateTasksAll();
+        saveAll();
+    }
+    
+});
 
 const updateTasks = (tasks, tasksObject, buttonAdd) => {
     let toRemove = tasksObject.querySelectorAll(".task");
@@ -55,10 +105,35 @@ const updateTasks = (tasks, tasksObject, buttonAdd) => {
     });
     for (let i = 0; i < tasks.length; i ++) {
         let task = document.createElement("div");
+        task.draggable = true;
         task.classList.add("task");
+        task.classList.add(i);
         if (tasks[i].isDone) {
             task.classList.add("done");
         }
+        task.addEventListener("dragstart", (event) => {
+            event.target.style.opacity = 0.3;
+            draggingIndex = i;
+            draggingList = tasks;
+            console.log(i);
+            console.log(tasks);
+        });
+        task.addEventListener("dragend", (event) => {
+            event.target.style.opacity = 1;
+        });
+        task.addEventListener("dragover", (event) => {
+            event.preventDefault();
+        });
+        task.addEventListener("drop", (event) => {
+            if (draggingIndex != i || draggingList != tasks) {
+                console.log("Removing: " + draggingIndex);
+                console.log("Adding: " + i);
+                tasks.splice(i, 0, draggingList[draggingIndex]);
+                draggingList.pop(draggingIndex);
+                updateTasksAll();
+                saveAll();
+            }
+        });
 
         let buttonDone = document.createElement("button");
         buttonDone.innerHTML = "<svg class='w-6 h-6 text-gray-800 dark:text-white' aria-hidden='true' xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' viewBox='0 0 24 24'>" +
