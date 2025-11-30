@@ -1,195 +1,142 @@
 
+// Константы
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const BUTTON_DONE_ICON = "<svg class='w-6 h-6 text-gray-800 dark:text-white' aria-hidden='true' xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' viewBox='0 0 24 24'>" +
+    "<path stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'/>" +
+    "</svg>";
+const BUTTON_REMOVE_ICON = "<svg class='w-6 h-6 text-gray-800 dark:text-white' aria-hidden='true' xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' viewBox='0 0 24 24'>" +
+    "<path stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7.757 12h8.486M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'/>" +
+    "</svg>";
+
 const buttonAddToDo = document.querySelector("#todo .buttonAdd");
 const buttonAddInProgress = document.querySelector("#inprogress .buttonAdd");
 const buttonAddDone = document.querySelector("#done .buttonAdd");
 
-const tasksToDoObject = document.querySelector("#todo-tasks");
-const tasksInProgressObject = document.querySelector("#inprogress-tasks");
-const tasksDoneObject = document.querySelector("#done-tasks");
+const toDoContainer = document.querySelector("#todo-tasks");
+const inProgressContainer = document.querySelector("#inprogress-tasks");
+const doneContainer = document.querySelector("#done-tasks");
 
 const tableToDo = document.querySelector("#todo");
 const tableInProgress = document.querySelector("#inprogress");
 const tableDone = document.querySelector("#done");
 
-var draggingIndex = null;
-var draggingList = null;
+// Дроп конкретно на столбец
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var tasksToDo = [
-    {
-        "name": "Example task",
-        "isDone": false
+
+let tableDropEvent = (event, targetArray) => {
+    event.preventDefault();
+    if (!event.target.closest(".task")) {
+        removeTask(currentTable, currentIndex);
+        appendTask(targetArray, currentTask);
+        renderAllTasks();
     }
-]
-
-var tasksInProgress = []
-var tasksDone = []
-
-
-if (localStorage.getItem("tasksToDo") != null) {
-    tasksToDo = JSON.parse(localStorage.getItem("tasksToDo"));
-}
-if (localStorage.getItem("tasksInProgress") != null) {
-    tasksInProgress = JSON.parse(localStorage.getItem("tasksInProgress"));
-}
-if (localStorage.getItem("tasksDone") != null) {
-    tasksDone = JSON.parse(localStorage.getItem("tasksDone"));
-}
-
-buttonAddToDo.addEventListener("click", () => {
-    tasksToDo.push(
-        {
-            "name":"",
-            "isDone": false
-        }
-    );
-    updateTasksAll();
-    saveAll();
-})
-buttonAddInProgress.addEventListener("click", () => {
-    tasksInProgress.push(
-        {
-            "name":"",
-            "isDone": false
-        }
-    );
-    updateTasksAll();
-    saveAll();
-})
-buttonAddDone.addEventListener("click", () => {
-    tasksDone.push(
-        {
-            "name":"",
-            "isDone": false
-        }
-    );
-    updateTasksAll();
-    saveAll();
-})
+};
 
 tableToDo.addEventListener("dragover", (event) => {event.preventDefault();});
-tableToDo.addEventListener("drop", (event) => {
-    event.preventDefault();
-    if (!event.target.closest(".task")) {
-        tasksToDo.push(draggingList[draggingIndex]);
-        draggingList.pop(draggingIndex);
-        updateTasksAll();
-        saveAll();
-    }
-});
-tableInProgress.addEventListener("dragover", (event) => {event.preventDefault();});
-tableInProgress.addEventListener("drop", (event) => {
-    event.preventDefault();
-    if (!event.target.closest(".task")) {
-        tasksInProgress.push(draggingList[draggingIndex]);
-        draggingList.pop(draggingIndex);
-        updateTasksAll();
-        saveAll();
-    }
-});
-tableDone.addEventListener("dragover", (event) => {event.preventDefault();});
-tableDone.addEventListener("drop", (event) => {
-    event.preventDefault();
-    if (!event.target.closest(".task")) {
-        tasksDone.push(draggingList[draggingIndex]);
-        draggingList.pop(draggingIndex);
-        updateTasksAll();
-        saveAll();
-    }
-    
-});
+tableToDo.addEventListener("drop", (event) => {tableDropEvent(event, arrayToDo)});
 
-const updateTasks = (tasks, tasksObject, buttonAdd) => {
-    let toRemove = tasksObject.querySelectorAll(".task");
+tableInProgress.addEventListener("dragover", (event) => {event.preventDefault();});
+tableInProgress.addEventListener("drop", (event) => {tableDropEvent(event, arrayInProgress)});
+
+tableDone.addEventListener("dragover", (event) => {event.preventDefault();});
+tableDone.addEventListener("drop", (event) => {tableDropEvent(event, arrayDone)});
+
+
+// Рендер на страницу
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const renderArray = (array, container, buttonAdd) => {
+    let toRemove = container.querySelectorAll(".task");
     toRemove.forEach(element => {
-        tasksObject.removeChild(element);
+        container.removeChild(element);
     });
-    for (let i = 0; i < tasks.length; i ++) {
+
+    let createTask = (index) => {
         let task = document.createElement("div");
         task.draggable = true;
         task.classList.add("task");
-        task.classList.add(i);
-        if (tasks[i].isDone) {
-            task.classList.add("done");
-        }
+        task.classList.add(index);
+        if (array[index].isDone) {task.classList.add("done");}
+        
         task.addEventListener("dragstart", (event) => {
             event.target.style.opacity = 0.3;
-            draggingIndex = i;
-            draggingList = tasks;
-            console.log(i);
-            console.log(tasks);
+            currentTable = array;
+            currentIndex = index;
+            currentTask = array[index];
         });
         task.addEventListener("dragend", (event) => {
             event.target.style.opacity = 1;
+            renderAllTasks();
         });
-        task.addEventListener("dragover", (event) => {
-            event.preventDefault();
-        });
+        task.addEventListener("dragover", (event) => {event.preventDefault();});
         task.addEventListener("drop", (event) => {
-            if (draggingIndex != i || draggingList != tasks) {
-                console.log("Removing: " + draggingIndex);
-                console.log("Adding: " + i);
-                tasks.splice(i, 0, draggingList[draggingIndex]);
-                draggingList.pop(draggingIndex);
-                updateTasksAll();
-                saveAll();
-            }
+            event.preventDefault();
+            removeTask(currentTable, currentIndex);
+            insertTask(array, currentTask, index);
         });
 
         let buttonDone = document.createElement("button");
-        buttonDone.innerHTML = "<svg class='w-6 h-6 text-gray-800 dark:text-white' aria-hidden='true' xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' viewBox='0 0 24 24'>" +
-            "<path stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'/>" +
-            "</svg>";
+        buttonDone.innerHTML = BUTTON_DONE_ICON;
         buttonDone.classList.add("buttonDone");
         buttonDone.addEventListener("click", () => {
-            if (tasks[i].isDone) {
-                task.classList.remove("done");
-            } else {
-                task.classList.add("done");
-            }
-            tasks[i].isDone = !tasks[i].isDone;
-            saveAll();
-            
+            task.classList.remove("done");
+            if (!array[index].isDone) {task.classList.add("done");}
+            array[index].isDone = !array[index].isDone;
+            saveArray();
         });
+        task.append(buttonDone);
 
         let textArea = document.createElement("textarea");
-        textArea.textContent = tasks[i].name;
+        textArea.textContent = array[index].name;
         textArea.classList.add("name");
         textArea.maxLength = 40
         textArea.addEventListener("input", () => {
-            tasks[i].name = textArea.value;
-            saveAll();
+            array[index].name = textArea.value;
+            saveArray();
         });
+        task.append(textArea);
 
         let buttonRemove = document.createElement("button");
-        buttonRemove.innerHTML = "<svg class='w-6 h-6 text-gray-800 dark:text-white' aria-hidden='true' xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' viewBox='0 0 24 24'>" +
-            "<path stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7.757 12h8.486M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'/>" +
-            "</svg>";
+        buttonRemove.innerHTML = BUTTON_REMOVE_ICON;
         buttonRemove.classList.add("buttonRemove");
         buttonRemove.addEventListener("click", () => {
-            tasks.splice(i, 1);
-            updateTasksAll();
-            saveAll();
+            removeTask(array, index);
+            renderAllTasks();
         });
-
-        task.append(buttonDone);
-        task.append(textArea);
         task.append(buttonRemove);
 
+        return task;
+    }
 
-        tasksObject.insertBefore(task, buttonAdd);
+    for (let i = 0; i < array.length; i ++) {
+        container.insertBefore(createTask(i), buttonAdd);
     }
 }
 
-const updateTasksAll = () => {
-    updateTasks(tasksToDo, tasksToDoObject, buttonAddToDo);
-    updateTasks(tasksInProgress, tasksInProgressObject, buttonAddInProgress);
-    updateTasks(tasksDone, tasksDoneObject, buttonAddDone);
+const renderAllTasks = () => {
+    renderArray(arrayToDo, toDoContainer, buttonAddToDo);
+    renderArray(arrayInProgress, inProgressContainer, buttonAddInProgress);
+    renderArray(arrayDone, doneContainer, buttonAddDone);
 }
 
-const saveAll = () => {
-    localStorage.setItem("tasksToDo", JSON.stringify(tasksToDo));
-    localStorage.setItem("tasksInProgress", JSON.stringify(tasksInProgress));
-    localStorage.setItem("tasksDone", JSON.stringify(tasksDone));
-}
+// Кнопки добавления
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-updateTasksAll();
+let buttonAddEvent = (targetTask) => {
+    appendTask(targetTask, {
+            "name":"",
+            "isDone": false
+        });
+    renderAllTasks();
+}
+buttonAddToDo.addEventListener("click", () => {buttonAddEvent(arrayToDo)});
+buttonAddInProgress.addEventListener("click", () => {buttonAddEvent(arrayInProgress)});
+buttonAddDone.addEventListener("click", () => {buttonAddEvent(arrayDone)});
+
+// Инициализация
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+loadArray();
+renderAllTasks();
